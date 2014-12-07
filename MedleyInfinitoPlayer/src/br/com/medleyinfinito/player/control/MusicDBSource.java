@@ -28,7 +28,7 @@ public class MusicDBSource {
 		this.nextMusicPart = null;
 		startNextMusicFetcher();
 		try {
-			Thread.sleep(100);
+			Thread.sleep(300);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -37,6 +37,7 @@ public class MusicDBSource {
 	private MusicPart fetchNextMusicPart() throws SQLException, MusicPartNotFound {
 		String restriction = // .
 		" filepath <> '" + this.currentMusicPart.getFilePath() + "'" + // .
+				" AND originalfile <> '" + this.currentMusicPart.getOriginalFile() + "'" + // .
 				" AND keynote = " + this.currentMusicPart.getKeynote() + // .
 				" AND (tempo BETWEEN " + Integer.toString(this.currentMusicPart.getTempo() - TEMPO_TOLERANCE) + // .
 				" AND " + Integer.toString(this.currentMusicPart.getTempo() + TEMPO_TOLERANCE) + // .
@@ -44,7 +45,7 @@ public class MusicDBSource {
 				" AND " + Integer.toString((this.currentMusicPart.getTempo() / 2) + TEMPO_TOLERANCE) + // .
 				") OR (tempo BETWEEN " + Integer.toString((this.currentMusicPart.getTempo() * 2) - TEMPO_TOLERANCE) + // .
 				" AND " + Integer.toString((this.currentMusicPart.getTempo() * 2) + TEMPO_TOLERANCE) + ")"; // .
-		System.out.println(restriction);
+		System.out.println("fetchNextMusicPart() restriction = " + restriction);
 		return this.fetchMusicPart(restriction);
 	}
 
@@ -80,7 +81,7 @@ public class MusicDBSource {
 		if (restriction != null) {
 			sql += " WHERE " + restriction;
 		}
-		System.out.println("Executing " + sql);
+		System.out.println("fetchMusicPart(String restriction) sql = " + sql);
 		PreparedStatement statement = connection.prepareStatement(sql);
 		ResultSet results = statement.executeQuery();
 		List<MusicPart> musicParts = new ArrayList<MusicPart>();
@@ -95,7 +96,7 @@ public class MusicDBSource {
 			return null;
 		}
 		results.close();
-		System.out.println("fetch " + musicParts.size() + " music parts");
+		System.out.println("fetchMusicPart(String restriction) fetch " + musicParts.size() + " music parts");
 		List<MusicPart> musicPartsToIgnore = new ArrayList<MusicPart>();
 		for (MusicPart musicPart : musicParts) {
 			if (alreadyPlayed.contains(musicPart)) {
@@ -108,11 +109,11 @@ public class MusicDBSource {
 		if (musicParts.size() == 0) {
 			return null;
 		}
-		int index = (new Random().nextInt() % musicParts.size()) - 1;
+		int index = new Random().nextInt(musicParts.size());
 		index = index < 0 ? 0 : index;
-		System.out.println("index = " + index);
+		System.out.println("fetchMusicPart(String restriction) index = " + index);
 		MusicPart musicPart = musicParts.get(index);
-		System.out.println("choose " + musicPart.getFilePath());
+		System.out.println("fetchMusicPart(String restriction) choose " + musicPart.getFilePath());
 		return musicPart;
 
 	}

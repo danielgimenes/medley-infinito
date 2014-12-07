@@ -1,55 +1,45 @@
 package br.com.medleyinfinito.player.control;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import javax.media.ControllerEvent;
-import javax.media.ControllerListener;
-import javax.media.EndOfMediaEvent;
-import javax.media.Format;
-import javax.media.Manager;
-import javax.media.MediaLocator;
-import javax.media.NoPlayerException;
-import javax.media.Player;
-import javax.media.PlugInManager;
-import javax.media.format.AudioFormat;
-
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.advanced.AdvancedPlayer;
+import javazoom.jl.player.advanced.PlaybackEvent;
+import javazoom.jl.player.advanced.PlaybackListener;
 import br.com.medleyinfinito.player.exception.JMFPlayerNotInitializedException;
 
 public abstract class MusicPlayer {
 
 	private boolean musicIsPlaying;
 
-	public abstract void start() throws JMFPlayerNotInitializedException, NoPlayerException, MalformedURLException,
-			IOException;
+	public abstract void start() throws JMFPlayerNotInitializedException, MalformedURLException, IOException,
+			JavaLayerException;
 
-	protected Player createJMFPlayer(String mp3FilePath) throws NoPlayerException, MalformedURLException, IOException {
+	protected AdvancedPlayer createAdvancedPlayer(String mp3FilePath) throws MalformedURLException, IOException,
+			JavaLayerException {
 		File mp3File = new File(mp3FilePath);
 		if (!mp3File.exists()) {
 			throw new FileNotFoundException();
 		}
-		Format input1 = new AudioFormat(AudioFormat.MPEGLAYER3);
-		Format input2 = new AudioFormat(AudioFormat.MPEG);
-		Format output = new AudioFormat(AudioFormat.LINEAR);
-		PlugInManager.addPlugIn("com.sun.media.codec.audio.mp3.JavaDecoder", new Format[] { input1, input2 },
-				new Format[] { output }, PlugInManager.CODEC);
-		return Manager.createPlayer(new MediaLocator(mp3File.toURI().toURL()));
+		FileInputStream in = new FileInputStream(mp3FilePath);
+		AdvancedPlayer player = new AdvancedPlayer(in);
+		return player;
 	}
 
-	public void playUntilEnd(Player jmfPlayer) {
-		jmfPlayer.addControllerListener(new ControllerListener() {
+	protected void playUntilEnd(AdvancedPlayer player) throws JavaLayerException {
+		player.setPlayBackListener(new PlaybackListener() {
 			@Override
-			public void controllerUpdate(ControllerEvent event) {
-				if (event instanceof EndOfMediaEvent) {
-					MusicPlayer.this.musicIsPlaying = false;
-				}
+			public void playbackFinished(PlaybackEvent event) {
+				MusicPlayer.this.musicIsPlaying = false;
 			}
 		});
 		System.out.println("starting...");
 		this.musicIsPlaying = true;
-		jmfPlayer.start();
+		player.play();
 		while (this.musicIsPlaying) {
 			try {
 				Thread.sleep(100);
@@ -58,9 +48,7 @@ public abstract class MusicPlayer {
 			}
 		}
 		System.out.println("stopping...");
-		jmfPlayer.stop();
-		jmfPlayer.close();
-		jmfPlayer.deallocate();
+		player.close();
 	}
 
 }

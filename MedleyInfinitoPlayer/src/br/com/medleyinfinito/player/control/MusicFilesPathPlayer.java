@@ -6,23 +6,22 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.NoPlayerException;
-import javax.media.Player;
-
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.advanced.AdvancedPlayer;
 import br.com.medleyinfinito.player.exception.JMFPlayerNotInitializedException;
 import br.com.medleyinfinito.player.exception.NoMusicFilesInDirException;
 import br.com.medleyinfinito.player.exception.NotADirectoryException;
 
 public class MusicFilesPathPlayer extends MusicPlayer {
 
-	private List<Player> jmfPlayers;
+	private List<AdvancedPlayer> players;
 
 	private MusicFilesPathPlayer() {
-		this.jmfPlayers = new ArrayList<Player>();
+		this.players = new ArrayList<AdvancedPlayer>();
 	}
 
-	public MusicFilesPathPlayer(String musicFilesDirectory) throws NoPlayerException, MalformedURLException,
-			IOException, NoMusicFilesInDirException, NotADirectoryException {
+	public MusicFilesPathPlayer(String musicFilesDirectory) throws MalformedURLException,
+			IOException, NoMusicFilesInDirException, NotADirectoryException, JavaLayerException {
 		this();
 		File musicDirectory = new File(musicFilesDirectory);
 		if (!musicDirectory.isDirectory()) {
@@ -33,24 +32,26 @@ public class MusicFilesPathPlayer extends MusicPlayer {
 			throw new NoMusicFilesInDirException();
 		}
 		for (File musicFile : musicFiles) {
-			this.jmfPlayers.add(super.createJMFPlayer(musicFile.getAbsolutePath()));
+			System.out.println("Processing file " + musicFile.getPath());
+			this.players.add(super.createAdvancedPlayer(musicFile.getAbsolutePath()));
 		}
 	}
 
-	public MusicFilesPathPlayer(String[] musicFilePaths) throws NoPlayerException, MalformedURLException, IOException {
+	public MusicFilesPathPlayer(String[] musicFilePaths) throws MalformedURLException, IOException, JavaLayerException {
 		this();
 		for (String mp3FilePath : musicFilePaths) {
-			this.jmfPlayers.add(super.createJMFPlayer(mp3FilePath));
+			System.out.println("Processing file " + mp3FilePath);
+			this.players.add(super.createAdvancedPlayer(mp3FilePath));
 		}
 	}
 
 	@Override
-	public void start() throws JMFPlayerNotInitializedException {
-		for (Player jmfPlayer : jmfPlayers) {
-			if (jmfPlayer == null) {
+	public void start() throws JMFPlayerNotInitializedException, JavaLayerException {
+		for (AdvancedPlayer player : players) {
+			if (player == null) {
 				throw new JMFPlayerNotInitializedException();
 			}
-			super.playUntilEnd(jmfPlayer);
+			super.playUntilEnd(player);
 		}
 	}
 

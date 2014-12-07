@@ -4,27 +4,25 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import javax.media.NoPlayerException;
-import javax.media.Player;
-
+import javazoom.jl.decoder.JavaLayerException;
+import javazoom.jl.player.advanced.AdvancedPlayer;
 import br.com.medleyinfinito.player.exception.JMFPlayerNotInitializedException;
 
 public class MusicSourcePlayer extends MusicPlayer {
 
 	private MusicDBSource source;
-	private Player jmfPlayer;
 
-	public MusicSourcePlayer(MusicDBSource source) throws NoPlayerException, MalformedURLException, IOException {
+	public MusicSourcePlayer(MusicDBSource source) throws MalformedURLException, IOException {
 		this.source = source;
 	}
 
 	@Override
-	public void start() throws JMFPlayerNotInitializedException, NoPlayerException, MalformedURLException, IOException {
+	public void start() throws JMFPlayerNotInitializedException, MalformedURLException, IOException, JavaLayerException {
 		File musicFile = null;
 		while ((musicFile = source.getNextMusicFile()) != null) {
 			System.out.println("Playing file " + musicFile.getPath());
-			this.jmfPlayer = super.createJMFPlayer(musicFile.getAbsolutePath());
-			super.playUntilEnd(this.jmfPlayer);
+			AdvancedPlayer player = super.createAdvancedPlayer(musicFile.getAbsolutePath());
+			super.playUntilEnd(player);
 		}
 	}
 }

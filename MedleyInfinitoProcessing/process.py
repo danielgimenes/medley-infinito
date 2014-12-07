@@ -15,8 +15,17 @@ def process(input_dir, output_dir, parts, length):
 
     for filepath in mp3files:
         print "Analyzing {}".format(filepath)
-        key, tempo = analyze(filepath)
+        key, tempo, start, end  = analyze(filepath)
         insert_data_in_db.insert(filepath, key, tempo)
+        # crop the edges
+        os.system(
+            "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(
+                filepath,
+                split_mp3.convert_time(start),
+                split_mp3.convert_time(start-end),
+                filepath
+            )
+        )
 
 
 if __name__ == "__main__":

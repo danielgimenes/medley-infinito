@@ -26,12 +26,12 @@ def analyze(file_path):
   file_id = init(file_path)
 
   response = commands.getoutput("php -f MedleyInfinitoProcessing/analyzeTempo.php " + file_id)
-  
+
   json_dict = json.loads(response)
 
-  first_click = json_dict.get('auftakt_result').get('click_marks')[0]
+  first_click = json_dict.get('auftakt_result').get('click_marks')[0]['time']
 
-  last_click = json_dict.get('auftakt_result').get('click_marks')[-1]
+  last_click = json_dict.get('auftakt_result').get('click_marks')[-1]['time']
 
   overall_tempo = json_dict.get('auftakt_result').get('overall_tempo')
 

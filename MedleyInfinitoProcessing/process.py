@@ -6,6 +6,7 @@ import database
 import split_mp3
 from replace_filename_spaces import replace_spaces
 import sonic_functions
+import xml
 
 
 def process(input_dir, output_dir, parts, length):
@@ -35,7 +36,7 @@ def process(input_dir, output_dir, parts, length):
                             filepath
                         )
                     )
-                except KeyError:
+                except KeyError, xml.etree.ElementTree.ParseError:
                     pass
             else:
                 print "Skipping... Already in database"

@@ -16,7 +16,7 @@ import br.com.medleyinfinito.player.model.MusicPart;
 
 public class MusicDBSource {
 
-	private static final Integer TEMPO_TOLERANCE = 10;
+	private static final Integer TEMPO_TOLERANCE = 5;
 	private List<MusicPart> alreadyPlayed;
 	private MusicPart currentMusicPart;
 	private MusicPart nextMusicPart;

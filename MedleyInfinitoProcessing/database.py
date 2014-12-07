@@ -18,6 +18,21 @@ def insert(filepath, key_id, tempo):
     conn.close()
 
 
+def doesnt_exist(filename):
+    conn = psycopg2.connect(
+        "host=localhost dbname=medleyinfinito_db user=postgres password=cogitoR341"
+    )
+    cur = conn.cursor()
+    cur.execute("SELECT 1 FROM parts WHERE filepath = '{}';".format(filename))
+    result = cur.fetchone()
+    cur.close()
+    conn.close()
+    if result is not None:
+        return False
+    else:
+        return True
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("filepath", type=str)

@@ -1,66 +1,57 @@
 package br.com.medleyinfinito.player.control;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import javax.media.ControllerEvent;
-import javax.media.ControllerListener;
-import javax.media.EndOfMediaEvent;
-import javax.media.Format;
-import javax.media.Manager;
-import javax.media.MediaLocator;
-import javax.media.NoPlayerException;
-import javax.media.Player;
-import javax.media.PlugInManager;
-import javax.media.format.AudioFormat;
-
-import br.com.medleyinfinito.player.exception.JMFPlayerNotInitializedException;
+import br.com.medleyinfinito.player.model.MusicPart;
 
 public abstract class MusicPlayer {
 
-	private boolean musicIsPlaying;
+	private static final Integer FADE_OUT_DURATION = 10;
+	private static final Integer DEFAULT_SLEEP_DURATION = 20;
 
-	public abstract void start() throws JMFPlayerNotInitializedException, NoPlayerException, MalformedURLException,
-			IOException;
+	public abstract void start() throws MalformedURLException, IOException;
 
-	protected Player createJMFPlayer(String mp3FilePath) throws NoPlayerException, MalformedURLException, IOException {
-		File mp3File = new File(mp3FilePath);
-		if (!mp3File.exists()) {
-			throw new FileNotFoundException();
+	protected void playUntilEnd(MusicPart musicPart) throws IOException {
+		ProcessBuilder pb = new ProcessBuilder("cvlc", "--no-loop", musicPart.getFilePath());
+		System.out.println("starting...");
+		Process p = pb.start();
+		int sleepDurationInSeconds;
+		if (musicPart.getDuration() > 0) {
+			Integer durationWithoutFadeOut = musicPart.getDuration() - FADE_OUT_DURATION;
+			sleepDurationInSeconds = (durationWithoutFadeOut > 0 ? durationWithoutFadeOut : 0);
+		} else {
+			sleepDurationInSeconds = DEFAULT_SLEEP_DURATION;
 		}
-		Format input1 = new AudioFormat(AudioFormat.MPEGLAYER3);
-		Format input2 = new AudioFormat(AudioFormat.MPEG);
-		Format output = new AudioFormat(AudioFormat.LINEAR);
-		PlugInManager.addPlugIn("com.sun.media.codec.audio.mp3.JavaDecoder", new Format[] { input1, input2 },
-				new Format[] { output }, PlugInManager.CODEC);
-		return Manager.createPlayer(new MediaLocator(mp3File.toURI().toURL()));
+		try {
+			System.out.println("Waiting for " + sleepDurationInSeconds + " seconds");
+			Thread.sleep(sleepDurationInSeconds * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("fading out...");
+		new Thread(new ProcessCleaner(p)).start();
 	}
+	
+	class ProcessCleaner implements Runnable {
+		private Process p;
 
-	public void playUntilEnd(Player jmfPlayer) {
-		jmfPlayer.addControllerListener(new ControllerListener() {
-			@Override
-			public void controllerUpdate(ControllerEvent event) {
-				if (event instanceof EndOfMediaEvent) {
-					MusicPlayer.this.musicIsPlaying = false;
+		public ProcessCleaner(Process p) {
+			this.p = p;
+		}
+
+		@Override
+		public void run() {
+			while (p.isAlive()) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
 			}
-		});
-		System.out.println("starting...");
-		this.musicIsPlaying = true;
-		jmfPlayer.start();
-		while (this.musicIsPlaying) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			p.destroy();
 		}
-		System.out.println("stopping...");
-		jmfPlayer.stop();
-		jmfPlayer.close();
-		jmfPlayer.deallocate();
-	}
+		
+	};
 
 }

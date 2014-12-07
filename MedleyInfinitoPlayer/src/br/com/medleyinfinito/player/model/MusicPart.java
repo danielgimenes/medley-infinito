@@ -8,13 +8,15 @@ public class MusicPart {
 	private String originalFile;
 	private Integer keynote;
 	private Integer tempo;
+	private Integer duration;
 
-	public MusicPart(String filePath, String originalFile, Integer keynote, Integer tempo) {
+	public MusicPart(String filePath, String originalFile, Integer keynote, Integer tempo, Integer duration) {
 		super();
 		this.filePath = filePath;
 		this.originalFile = originalFile;
 		this.keynote = keynote;
 		this.tempo = tempo;
+		this.duration = duration;
 	}
 
 	public String getFilePath() {
@@ -40,13 +42,21 @@ public class MusicPart {
 	public void setTempo(Integer tempo) {
 		this.tempo = tempo;
 	}
-	
+
 	public String getOriginalFile() {
 		return originalFile;
 	}
 
 	public void setOriginalFile(String originalFile) {
 		this.originalFile = originalFile;
+	}
+
+	public Integer getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Integer duration) {
+		this.duration = duration;
 	}
 
 	@Override

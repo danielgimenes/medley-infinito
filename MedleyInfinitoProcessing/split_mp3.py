@@ -3,7 +3,7 @@ import glob
 import os
 
 
-def main(input_dir, output_dir, parts, length):
+def split(input_dir, output_dir, parts, length):
     # ignore first 15 seconds of the music file
     start_border = 15
 
@@ -22,7 +22,7 @@ def main(input_dir, output_dir, parts, length):
             print "-- Part {} of {}".format(part, parts)
             start = start_border + part * length
             os.system(
-                "avconv -i {} -acodec copy -ss {} -t {} {}".format(
+                "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(
                     inputpath,
                     convert_time(start),
                     convert_time(length),
@@ -40,4 +40,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    main(args.input_dir, args.output_dir, args.n, args.l)
+    split(args.input_dir, args.output_dir, args.n, args.l)

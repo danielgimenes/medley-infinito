@@ -3,13 +3,14 @@ import psycopg2
 
 
 def insert(filepath, key_id, tempo):
+    filename = "_".join(filepath.split("/")[-1].split("_")[:-1])
     conn = psycopg2.connect(
         "host=localhost dbname=medleyinfinito_db user=postgres password=cogitoR341"
     )
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO parts (filepath, keynote, tempo) VALUES ('{}', {}, {});".format(
-            filepath, key_id, tempo
+        "INSERT INTO parts (filepath, keynote, tempo, originalfile) VALUES ('{}', {}, {}, '{}');".format(
+            filepath, key_id, tempo, filename
         )
     )
     conn.commit()

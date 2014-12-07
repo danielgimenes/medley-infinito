@@ -1,11 +1,12 @@
 <?php
-$accessId = 'bc59492a-d127-487b-acb4-c2e4226b34cb';
+$accessId = '03806329-d448-46fb-b21b-c2ef41b3e81d';
 $taskUrl = 'analyze/key';
 $parameters = array();
 $parameters['access_id'] = $accessId;
 $parameters['format'] = 'json';
 
-$parameters['input_file'] = 'http://www.sonicAPI.com/music/brown_eyes_by_ueberschall.mp3';
+$file_id = $argv[1];
+$parameters['input_file'] = $file_id;
 
 // important: the calls require the CURL extension for PHP
 $ch = curl_init('https://api.sonicAPI.com/' . $taskUrl);

@@ -207,7 +207,7 @@ public class InfiniteMedleyPlayerWindow {
 		if (nextMusic == null) {
 			nextTitleLabel.setText("");
 			nextArtistLabel.setText("");
-			nextAlbumImage = new JLabel("");
+			nextAlbumImage.setIcon(null);
 			nextAlbumImage.setForeground(BACKGROUND_COLOR);
 			return;
 		}

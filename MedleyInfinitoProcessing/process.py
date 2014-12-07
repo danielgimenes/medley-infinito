@@ -10,31 +10,32 @@ import sonic_functions
 
 def process(input_dir, output_dir, parts, length):
     replace_spaces(input_dir)
-    split_mp3.split(input_dir, output_dir, parts, length)
-    mp3files = glob.glob(output_dir + "/*.mp3")
+    original_mp3_files = glob.glob(input_dir + "/*.mp3")
 
-    for filepath in mp3files:
-        print "Processing {}".format(filepath)
-        print "Check if already in database"
-        analyze = database.doesnt_exist(filepath)
-        if analyze:
-            print "Analyze"
-            key, tempo, start, end  = sonic_functions.analyze(filepath)
-            if key > 11:
-                key = ((key - 9) % 12)
-            database.insert(filepath, key, tempo)
-            # crop the edges
-            print "Crop the edges"
-            os.system(
-                "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(
-                    filepath,
-                    split_mp3.convert_time(start),
-                    split_mp3.convert_time(start-end),
-                    filepath
+    for input_file_path in original_mp3_files:
+        mp3files = split_mp3.split_file(input_file_path, output_dir, parts, length)
+        for filepath in mp3files:
+            print "Processing {}".format(filepath)
+            print "Check if already in database"
+            analyze = database.doesnt_exist(filepath)
+            if analyze:
+                print "Analyze"
+                key, tempo, start, end  = sonic_functions.analyze(filepath)
+                if key > 11:
+                    key = ((key - 9) % 12)
+                database.insert(filepath, key, tempo)
+                # crop the edges
+                print "Crop the edges"
+                os.system(
+                    "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(
+                        filepath,
+                        split_mp3.convert_time(start),
+                        split_mp3.convert_time(end-start),
+                        filepath
+                    )
                 )
-            )
-        else:
-            print "Skipping... Already in database"
+            else:
+                print "Skipping... Already in database"
 
 
 if __name__ == "__main__":

@@ -1,9 +1,9 @@
 psql -c "ALTER USER postgres WITH password 'cogitoR341';"
 psql -c "CREATE DATABASE medleyinfinito_db;"
-psql -c "CREATE TABLE parts (filepath varchar(256) primary key, keynote integer, tempo integer);" medleyinfinito_db 
+psql -c "CREATE TABLE parts (filepath varchar(256) primary key, originalfile varchar(100), keynote integer, tempo integer);" medleyinfinito_db 
 
-psql -c "INSERT INTO parts (filepath, keynote, tempo) VALUES ('/mp3/baseMp3Desenv/short/03_-_Nemesis_short.mp3', 1, 120);" medleyinfinito_db
+psql -c "INSERT INTO parts (filepath, originalfile, keynote, tempo) VALUES ('/mp3/baseMp3Desenv/short/03_-_Nemesis_short.mp3', '03_-_Nemesis_short.mp3', 1, 120);" medleyinfinito_db
 
-psql -c "INSERT INTO parts (filepath, keynote, tempo) VALUES ('/mp3/baseMp3Desenv/short/01_-_Mourning_Palace_short.mp3', 2, 60);" medleyinfinito_db
+psql -c "INSERT INTO parts (filepath, originalfile, keynote, tempo) VALUES ('/mp3/baseMp3Desenv/short/01_-_Mourning_Palace_short.mp3', '01_-_Mourning_Palace_short.mp3', 2, 60);" medleyinfinito_db
 
-psql -c "INSERT INTO parts (filepath, keynote, tempo) VALUES ('/mp3/baseMp3Desenv/short/06_Unchain_Utopia_short.mp3', 1, 60);" medleyinfinito_db
+psql -c "INSERT INTO parts (filepath, originalfile, keynote, tempo) VALUES ('/mp3/baseMp3Desenv/short/06_Unchain_Utopia_short.mp3', '06_Unchain_Utopia_short.mp3', 1, 60);" medleyinfinito_db

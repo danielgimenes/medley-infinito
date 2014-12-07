@@ -4,6 +4,7 @@ import echo_functions
 import glob
 import os
 import pydub
+import random
 import sonic_functions
 import split_mp3
 import xml
@@ -17,6 +18,7 @@ def process(input_dir, output_dir, parts, length):
 
     for input_file_path in original_mp3_files:
         mp3files = split_mp3.split_file(input_file_path, output_dir, parts, length)
+        random.shuffle(mp3files)
         for filepath in mp3files:
             print "Processing {}".format(filepath)
             print "Check if already in database"

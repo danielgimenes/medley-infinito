@@ -5,12 +5,14 @@ import java.io.FileNotFoundException;
 
 public class MusicPart {
 	private String filePath;
+	private String originalFile;
 	private Integer keynote;
 	private Integer tempo;
 
-	public MusicPart(String filePath, Integer keynote, Integer tempo) {
+	public MusicPart(String filePath, String originalFile, Integer keynote, Integer tempo) {
 		super();
 		this.filePath = filePath;
+		this.originalFile = originalFile;
 		this.keynote = keynote;
 		this.tempo = tempo;
 	}
@@ -38,10 +40,19 @@ public class MusicPart {
 	public void setTempo(Integer tempo) {
 		this.tempo = tempo;
 	}
+	
+	public String getOriginalFile() {
+		return originalFile;
+	}
+
+	public void setOriginalFile(String originalFile) {
+		this.originalFile = originalFile;
+	}
 
 	@Override
 	public String toString() {
-		return "MusicPart [filePath=" + filePath + ", keynote=" + keynote + ", tempo=" + tempo + "]";
+		return "MusicPart [filePath=" + filePath + ", originalFile=" + originalFile + ", keynote=" + keynote
+				+ ", tempo=" + tempo + "]";
 	}
 
 	@Override

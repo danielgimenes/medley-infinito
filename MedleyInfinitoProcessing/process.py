@@ -20,20 +20,23 @@ def process(input_dir, output_dir, parts, length):
             analyze = database.doesnt_exist(filepath)
             if analyze:
                 print "Analyze"
-                key, tempo, start, end  = sonic_functions.analyze(filepath)
-                if key > 11:
-                    key = ((key - 9) % 12)
-                database.insert(filepath, key, tempo)
-                # crop the edges
-                print "Crop the edges"
-                os.system(
-                    "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(
-                        filepath,
-                        split_mp3.convert_time(start),
-                        split_mp3.convert_time(end-start),
-                        filepath
+                try:
+                    key, tempo, start, end  = sonic_functions.analyze(filepath)
+                    if key > 11:
+                        key = ((key - 9) % 12)
+                    database.insert(filepath, key, tempo)
+                    # crop the edges
+                    print "Crop the edges"
+                    os.system(
+                        "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(
+                            filepath,
+                            split_mp3.convert_time(start),
+                            split_mp3.convert_time(end-start),
+                            filepath
+                        )
                     )
-                )
+                except KeyError:
+                    pass
             else:
                 print "Skipping... Already in database"
 

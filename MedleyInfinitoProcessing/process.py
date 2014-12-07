@@ -1,5 +1,6 @@
 import argparse
 import database
+import echo_functions
 import glob
 import os
 import pydub
@@ -23,18 +24,26 @@ def process(input_dir, output_dir, parts, length):
             if analyze:
                 print "Analyze"
                 try:
-                    key, tempo, start, end  = sonic_functions.analyze(filepath)
+                    key, tempo, right_key  = sonic_functions.analyze(filepath)
                     if key > 11:
                         key = ((key - 9) % 12)
-                    database.insert(filepath, key, tempo)
+                    right_key = right_key.replace(" ", "").title()
+                    name, cover, artist = echo_functions.retrieve_inf(filepath)
+                    for sc in "!@#$%^&*()[]{}';:,<>?|`~-=+":
+                        name = name.replace(sc, "")
+                        artist = artist.replace(sc, "")
                     # crop the edges
                     print "Fade the edges"
                     song = pydub.AudioSegment.from_mp3(filepath).fade_in(10000).fade_out(10000)
                     song.export(filepath, format="mp3")
+                    duration = song.duration_seconds
+                    database.insert(filepath, key, tempo, name, cover, artist, right_key, duration)
                 except (KeyError, xml.etree.ElementTree.ParseError, IndexError):
                     pass
             else:
-                print "Skipping... Already in database"
+                print "Skipping..."
+                #print "Updating metadata..."
+                #database.update(filepath, name, cover, artist, right_key, duration)
 
 
 if __name__ == "__main__":

@@ -2,15 +2,15 @@ import argparse
 import psycopg2
 
 
-def insert(filepath, key_id, tempo):
+def insert(filepath, key_id, tempo, name, cover, artist, right_key, duration):
     filename = "_".join(filepath.split("/")[-1].split("_")[:-1])
     conn = psycopg2.connect(
         "host=localhost dbname=medleyinfinito_db user=postgres password=cogitoR341"
     )
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO parts (filepath, keynote, tempo, originalfile) VALUES ('{}', {}, {}, '{}');".format(
-            filepath, key_id, tempo, filename
+        "INSERT INTO parts (filepath, keynote, tempo, originalfile, name, cover, artist, right_key, duration) VALUES ('{}', {}, {}, '{}', '{}', '{}', '{}', '{}', {});".format(
+            filepath, key_id, tempo, filename, name, cover, artist, right_key, duration
         )
     )
     conn.commit()
@@ -31,6 +31,17 @@ def doesnt_exist(filename):
         return False
     else:
         return True
+
+
+def update(filepath, name, cover, artist, right_key, duration):
+    conn = psycopg2.connect(
+        "host=localhost dbname=medleyinfinito_db user=postgres password=cogitoR341"
+    )
+    cur = conn.cursor()
+    cur.execute("UPDATE parts SET name = '{}', cover = '{}', artist = '{}', right_key = '{}', duration = {} WHERE filepath = '{}';".format(name, cover, artist, right_key, duration, filename))
+    conn.commit()
+    cur.close()
+    conn.close()
 
 
 if __name__ == "__main__":

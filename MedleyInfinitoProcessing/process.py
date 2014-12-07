@@ -4,10 +4,12 @@ import os
 
 import insert_data_in_db
 import split_mp3
+from replace_filename_spaces import replace_spaces
 from sonic_functions import analyze
 
 
 def process(input_dir, output_dir, parts, length):
+    replace_spaces(input_dir)
     split_mp3.split(input_dir, output_dir, parts, length)
     mp3files = glob.glob(output_dir + "/*.mp3")
 

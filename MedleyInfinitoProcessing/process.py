@@ -4,6 +4,7 @@ import os
 
 import insert_data_in_db
 import split_mp3
+from sonic_functions import analyze
 
 
 def process(input_dir, output_dir, parts, length):
@@ -11,7 +12,8 @@ def process(input_dir, output_dir, parts, length):
     mp3files = glob.glob(output_dir + "/*.mp3")
 
     for filepath in mp3files:
-        key, tempo = (5, 120)
+        print "Analyzing {}".format(filepath)
+        key, tempo = analyze(filepath)
         insert_data_in_db.insert(filepath, key, tempo)
 
 

@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Random;
 
 import br.com.medleyinfinito.player.exception.MusicPartNotFound;
 import br.com.medleyinfinito.player.model.MusicPart;
@@ -44,8 +45,16 @@ public class MusicDBSource {
 	}
 
 	private MusicPart fetchRandomMusicPart() throws SQLException, MusicPartNotFound {
-		// TODO
-		return this.fetchMusicPart();
+		MusicPart musicPart = null;
+		while (musicPart == null) {
+			int keynote = new Random().nextInt() % 24;
+			if (keynote < 0) {
+				keynote *= -1;
+			}
+			System.out.println("fetchRandomMusicPart() keynote = " + keynote);
+			musicPart = this.fetchMusicPart(" keynote = " + keynote);
+		}
+		return musicPart;
 	}
 
 	private Connection createDBConnection() throws SQLException {
@@ -85,8 +94,7 @@ public class MusicDBSource {
 			return musicPart;
 		} else {
 			results.close();
-			System.out.println("MusicPartNotFound");
-			throw new MusicPartNotFound();
+			return null;
 		}
 
 	}

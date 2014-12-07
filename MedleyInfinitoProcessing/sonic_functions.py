@@ -29,10 +29,6 @@ def analyze(file_path):
 
   json_dict = json.loads(response)
 
-  first_click = json_dict.get('auftakt_result').get('click_marks')[0]['time']
-
-  last_click = json_dict.get('auftakt_result').get('click_marks')[-1]['time']
-
   overall_tempo = json_dict.get('auftakt_result').get('overall_tempo')
 
   response = commands.getoutput("php -f MedleyInfinitoProcessing/analyzeKey.php " + file_id)
@@ -41,4 +37,6 @@ def analyze(file_path):
 
   key_index = json_dict.get('tonart_result').get('key_index')
 
-  return key_index, overall_tempo, first_click, last_click
+  key = json_dict.get('tonart_result').get('key')
+
+  return key_index, overall_tempo, key

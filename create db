@@ -1,9 +1,19 @@
 psql -c "ALTER USER postgres WITH password 'cogitoR341';"
 psql -c "CREATE DATABASE medleyinfinito_db;"
-psql -c "CREATE TABLE parts (filepath varchar(256) primary key, originalfile varchar(100), keynote integer, tempo integer);" medleyinfinito_db 
+psql -c "CREATE TABLE parts (filepath varchar(256) primary key, originalfile varchar(100), keynote integer, tempo integer);" medleyinfinito_db
 
 psql -c "INSERT INTO parts (filepath, originalfile, keynote, tempo) VALUES ('/mp3/baseMp3Desenv/short/03_-_Nemesis_short.mp3', '03_-_Nemesis_short.mp3', 1, 120);" medleyinfinito_db
 
 psql -c "INSERT INTO parts (filepath, originalfile, keynote, tempo) VALUES ('/mp3/baseMp3Desenv/short/01_-_Mourning_Palace_short.mp3', '01_-_Mourning_Palace_short.mp3', 2, 60);" medleyinfinito_db
 
 psql -c "INSERT INTO parts (filepath, originalfile, keynote, tempo) VALUES ('/mp3/baseMp3Desenv/short/06_Unchain_Utopia_short.mp3', '06_Unchain_Utopia_short.mp3', 1, 60);" medleyinfinito_db
+
+psql -c "ALTER TABLE parts ADD COLUMN duration integer DEFAULT 0;" medleyinfinito_db
+
+psql -c "ALTER TABLE parts ADD COLUMN right_key integer DEFAULT NULL;" medleyinfinito_db
+
+psql -c "ALTER TABLE parts ADD COLUMN artist varchar DEFAULT NULL;" medleyinfinito_db
+
+psql -c "ALTER TABLE parts ADD COLUMN cover varchar(300) DEFAULT NULL;" medleyinfinito_db
+
+psql -c "ALTER TABLE parts ADD COLUMN name varchar(100) DEFAULT NULL;" medleyinfinito_db

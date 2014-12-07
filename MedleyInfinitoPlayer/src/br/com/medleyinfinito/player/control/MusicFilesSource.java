@@ -23,7 +23,7 @@ public class MusicFilesSource {
 	}
 
 	public String getNextMusicFilePath() {
-		if (this.musicFileIndex > musicFiles.length) {
+		if (this.musicFileIndex >= musicFiles.length) {
 			return null;
 		}
 		return this.musicFiles[this.musicFileIndex++].getAbsolutePath();

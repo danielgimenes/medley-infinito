@@ -21,6 +21,7 @@ public class MusicFilesSourcePlayer extends MusicPlayer {
 	public void start() throws JMFPlayerNotInitializedException, NoPlayerException, MalformedURLException, IOException {
 		String musicFilePath = null;
 		while ((musicFilePath = source.getNextMusicFilePath()) != null) {
+			System.out.println("Playing file " + musicFilePath);
 			this.jmfPlayer = super.createJMFPlayer(musicFilePath);
 			this.jmfPlayer.start();
 			try {

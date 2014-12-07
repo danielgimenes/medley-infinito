@@ -24,6 +24,7 @@ public class Main {
 			// DEFAULT_MUSIC_FILES_DIRECTORY
 			// + "02_-_All_Love_Is_Gone.mp3");
 			player.start();
+			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(1);

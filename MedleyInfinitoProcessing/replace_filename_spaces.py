@@ -7,8 +7,9 @@ filelist = []
 files_with_spaces = []
 
 
-def replace_spaces(path):
-    dir_contents = os.listdir(path)
+def replace_spaces(filespath):
+    dir_contents = glob.glob(filespath + "/*.mp3")
+
     obtain_filenames(dir_contents)
     filename_has_space(filelist)
     replace_space(files_with_spaces)

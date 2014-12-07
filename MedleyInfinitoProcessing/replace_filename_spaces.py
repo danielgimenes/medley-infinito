@@ -27,7 +27,7 @@ def obtain_filenames(dir_contents):
 def remove_special_characters(filelist):
     for filename in filelist:
         newfilename = filename
-        for sc in "!@#$%^&*()[]{};:,<>?|`~-=+":
+        for sc in "!@#$%^&*()[]{}';:,<>?|`~-=+":
             newfilename = newfilename.replace(sc, "_")
         print filename, newfilename
         # see if newfilename already exists

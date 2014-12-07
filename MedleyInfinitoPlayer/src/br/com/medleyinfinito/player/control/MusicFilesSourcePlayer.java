@@ -11,10 +11,10 @@ import br.com.medleyinfinito.player.exception.JMFPlayerNotInitializedException;
 
 public class MusicFilesSourcePlayer extends MusicPlayer {
 
-	private MusicFilesSource source;
+	private MusicDBSource source;
 	private Player jmfPlayer;
 	
-	public MusicFilesSourcePlayer(MusicFilesSource source) throws NoPlayerException, MalformedURLException, IOException {
+	public MusicFilesSourcePlayer(MusicDBSource source) throws NoPlayerException, MalformedURLException, IOException {
 		this.source = source;
 	}
 

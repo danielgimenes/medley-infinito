@@ -1,56 +1,35 @@
 package br.com.medleyinfinito.player.control;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
-import javax.sound.sampled.FloatControl;
-
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.advanced.AdvancedPlayer;
-import javazoom.jl.player.advanced.PlaybackEvent;
-import javazoom.jl.player.advanced.PlaybackListener;
-import br.com.medleyinfinito.player.exception.JMFPlayerNotInitializedException;
+import br.com.medleyinfinito.player.model.MusicPart;
 
 public abstract class MusicPlayer {
 
-	private boolean musicIsPlaying;
+	private static final Integer FADE_OUT_DURATION = 10;
+	private static final Integer DEFAULT_SLEEP_DURATION = 30;
 
-	public abstract void start() throws JMFPlayerNotInitializedException, MalformedURLException, IOException,
-			JavaLayerException;
+	public abstract void start() throws MalformedURLException, IOException;
 
-	protected AdvancedPlayer createAdvancedPlayer(String mp3FilePath) throws MalformedURLException, IOException,
-			JavaLayerException {
-		File mp3File = new File(mp3FilePath);
-		if (!mp3File.exists()) {
-			throw new FileNotFoundException();
-		}
-		FileInputStream in = new FileInputStream(mp3FilePath);
-		AdvancedPlayer player = new AdvancedPlayer(in);
-		return player;
-	}
-
-	protected void playUntilEnd(AdvancedPlayer player) throws JavaLayerException {
-		player.setPlayBackListener(new PlaybackListener() {
-			@Override
-			public void playbackFinished(PlaybackEvent event) {
-				MusicPlayer.this.musicIsPlaying = false;
-			}
-		});
+	protected void playUntilEnd(MusicPart musicPart) throws IOException {
+		ProcessBuilder pb = new ProcessBuilder("cvlc", "--no-loop", musicPart.getFilePath());
 		System.out.println("starting...");
-		this.musicIsPlaying = true;
-		player.play();
-		while (this.musicIsPlaying) {
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+		Process p = pb.start();
+		int sleepDurationInSeconds;
+		if (musicPart.getDuration() > 0) {
+			Integer durationWithoutFadeOut = musicPart.getDuration() - FADE_OUT_DURATION;
+			sleepDurationInSeconds = (durationWithoutFadeOut > 0 ? durationWithoutFadeOut : 0);
+		} else {
+			sleepDurationInSeconds = DEFAULT_SLEEP_DURATION;
 		}
-		System.out.println("stopping...");
-		player.close();
+		try {
+			System.out.println("Waiting for " + sleepDurationInSeconds + " seconds");
+			Thread.sleep(sleepDurationInSeconds * 1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("fading out...");
 	}
 
 }

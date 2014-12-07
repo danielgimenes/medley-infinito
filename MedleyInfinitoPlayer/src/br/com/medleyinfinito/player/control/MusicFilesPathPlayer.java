@@ -6,22 +6,20 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.advanced.AdvancedPlayer;
-import br.com.medleyinfinito.player.exception.JMFPlayerNotInitializedException;
 import br.com.medleyinfinito.player.exception.NoMusicFilesInDirException;
 import br.com.medleyinfinito.player.exception.NotADirectoryException;
+import br.com.medleyinfinito.player.model.MusicPart;
 
 public class MusicFilesPathPlayer extends MusicPlayer {
 
-	private List<AdvancedPlayer> players;
+	private List<String> musicFiles;
 
 	private MusicFilesPathPlayer() {
-		this.players = new ArrayList<AdvancedPlayer>();
+		this.musicFiles = new ArrayList<String>();
 	}
 
-	public MusicFilesPathPlayer(String musicFilesDirectory) throws MalformedURLException,
-			IOException, NoMusicFilesInDirException, NotADirectoryException, JavaLayerException {
+	public MusicFilesPathPlayer(String musicFilesDirectory) throws MalformedURLException, IOException,
+			NoMusicFilesInDirException, NotADirectoryException {
 		this();
 		File musicDirectory = new File(musicFilesDirectory);
 		if (!musicDirectory.isDirectory()) {
@@ -32,26 +30,22 @@ public class MusicFilesPathPlayer extends MusicPlayer {
 			throw new NoMusicFilesInDirException();
 		}
 		for (File musicFile : musicFiles) {
-			System.out.println("Processing file " + musicFile.getPath());
-			this.players.add(super.createAdvancedPlayer(musicFile.getAbsolutePath()));
+			this.musicFiles.add(musicFile.getAbsolutePath());
 		}
 	}
 
-	public MusicFilesPathPlayer(String[] musicFilePaths) throws MalformedURLException, IOException, JavaLayerException {
+	public MusicFilesPathPlayer(String[] musicFilePaths) throws MalformedURLException, IOException {
 		this();
 		for (String mp3FilePath : musicFilePaths) {
 			System.out.println("Processing file " + mp3FilePath);
-			this.players.add(super.createAdvancedPlayer(mp3FilePath));
+			this.musicFiles.add(mp3FilePath);
 		}
 	}
 
 	@Override
-	public void start() throws JMFPlayerNotInitializedException, JavaLayerException {
-		for (AdvancedPlayer player : players) {
-			if (player == null) {
-				throw new JMFPlayerNotInitializedException();
-			}
-			super.playUntilEnd(player);
+	public void start() throws IOException {
+		for (String musicFile : this.musicFiles) {
+			super.playUntilEnd(new MusicPart(musicFile, "", 0, 0, 20));
 		}
 	}
 

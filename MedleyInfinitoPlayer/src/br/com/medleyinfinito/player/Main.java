@@ -1,13 +1,15 @@
 package br.com.medleyinfinito.player;
 
+import java.io.IOException;
+
 import br.com.medleyinfinito.player.control.MusicDBSource;
 import br.com.medleyinfinito.player.control.MusicFilesPathPlayer;
-import br.com.medleyinfinito.player.control.MusicSourcePlayer;
 import br.com.medleyinfinito.player.control.MusicPlayer;
+import br.com.medleyinfinito.player.control.MusicSourcePlayer;
 
 public class Main {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException, IOException {
 		try {
 			if (args.length > 0) {
 				if (args[0].equals("-d")) {

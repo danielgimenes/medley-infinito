@@ -36,7 +36,7 @@ def process(input_dir, output_dir, parts, length):
                             filepath
                         )
                     )
-                except KeyError, xml.etree.ElementTree.ParseError:
+                except (KeyError, xml.etree.ElementTree.ParseError, IndexError):
                     pass
             else:
                 print "Skipping... Already in database"

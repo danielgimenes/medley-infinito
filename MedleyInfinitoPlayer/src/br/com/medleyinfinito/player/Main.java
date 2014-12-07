@@ -2,10 +2,9 @@ package br.com.medleyinfinito.player;
 
 import java.io.IOException;
 
-import br.com.medleyinfinito.player.control.MusicDBSource;
 import br.com.medleyinfinito.player.control.MusicFilesPathPlayer;
 import br.com.medleyinfinito.player.control.MusicPlayer;
-import br.com.medleyinfinito.player.control.MusicSourcePlayer;
+import br.com.medleyinfinito.player.view.InfiniteMedleyPlayerWindow;
 
 public class Main {
 
@@ -23,10 +22,7 @@ public class Main {
 					System.exit(0);
 				}
 			} else {
-				MusicDBSource source = new MusicDBSource();
-				MusicPlayer player = new MusicSourcePlayer(source);
-				player.start();
-				System.exit(0);
+				new InfiniteMedleyPlayerWindow().run();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

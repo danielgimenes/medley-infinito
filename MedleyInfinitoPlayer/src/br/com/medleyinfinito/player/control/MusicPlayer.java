@@ -7,7 +7,7 @@ import br.com.medleyinfinito.player.model.MusicPart;
 
 public abstract class MusicPlayer {
 
-	private static final Integer FADE_OUT_DURATION = 10;
+	public static final Integer FADE_OUT_DURATION = 10;
 	private static final Integer DEFAULT_SLEEP_DURATION = 20;
 
 	public abstract void start() throws MalformedURLException, IOException;

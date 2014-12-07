@@ -45,7 +45,7 @@ public class MusicFilesPathPlayer extends MusicPlayer {
 	@Override
 	public void start() throws IOException {
 		for (String musicFile : this.musicFiles) {
-			super.playUntilEnd(new MusicPart(musicFile, "", 0, 0, 20));
+			super.playUntilEnd(new MusicPart(musicFile, "", 0, 0, 20, "", "", "", ""));
 		}
 	}
 

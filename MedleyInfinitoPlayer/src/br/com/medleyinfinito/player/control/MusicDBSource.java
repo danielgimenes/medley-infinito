@@ -15,13 +15,19 @@ import br.com.medleyinfinito.player.model.MusicPart;
 
 public class MusicDBSource {
 
+	public interface NextMusicListener {
+		public void musicChanged();
+	}
+
 	private static final Integer TEMPO_TOLERANCE = 5;
 	private List<MusicPart> alreadyPlayed;
 	private MusicPart currentMusicPart;
 	private MusicPart nextMusicPart;
 	private Connection conn;
+	private List<NextMusicListener> listeners;
 
 	public MusicDBSource() throws SQLException, MusicPartNotFound {
+		listeners = new ArrayList<NextMusicListener>();
 		alreadyPlayed = new ArrayList<MusicPart>();
 		this.currentMusicPart = fetchRandomMusicPart();
 		this.nextMusicPart = null;
@@ -90,7 +96,12 @@ public class MusicDBSource {
 			int keynote = results.getInt("keynote");
 			int tempo = results.getInt("tempo");
 			int duration = results.getInt("duration");
-			musicParts.add(new MusicPart(filePath, originalFile, keynote, tempo, duration));
+			String name = results.getString("name");
+			String artist = results.getString("artist");
+			String cover = results.getString("cover");
+			String right_key = results.getString("right_key");
+			musicParts.add(new MusicPart(filePath, originalFile,
+ keynote, tempo, duration, name, artist, right_key, cover));
 		}
 		if (musicParts.size() == 0) {
 			return null;
@@ -148,6 +159,7 @@ public class MusicDBSource {
 	public MusicPart getNextMusic() throws FileNotFoundException {
 		if (this.alreadyPlayed.size() == 0) {
 			this.alreadyPlayed.add(this.currentMusicPart);
+			callListeners();
 			return this.currentMusicPart;
 		}
 		if (this.nextMusicPart == null) {
@@ -157,6 +169,26 @@ public class MusicDBSource {
 		this.alreadyPlayed.add(this.currentMusicPart);
 		this.currentMusicPart = this.nextMusicPart;
 		this.nextMusicPart = null;
+		callListeners();
 		return musicPart;
+	}
+
+	private void callListeners() {
+		for (NextMusicListener listener : this.listeners) {
+			listener.musicChanged();
+		}
+	}
+
+	public void addNextMusicListener(NextMusicListener nextMusicListener) {
+		listeners.add(nextMusicListener);
+
+	}
+
+	public MusicPart getDefinedCurrentMusic() {
+		return this.currentMusicPart;
+	}
+
+	public MusicPart getDefinedNextMusic() {
+		return this.nextMusicPart;
 	}
 }

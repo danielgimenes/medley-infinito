@@ -9,14 +9,23 @@ public class MusicPart {
 	private Integer keynote;
 	private Integer tempo;
 	private Integer duration;
+	private String name;
+	private String artist;
+	private String key_right;
+	private String cover;
 
-	public MusicPart(String filePath, String originalFile, Integer keynote, Integer tempo, Integer duration) {
+	public MusicPart(String filePath, String originalFile, Integer keynote, Integer tempo, Integer duration,
+			String name, String artist, String key_right, String cover) {
 		super();
 		this.filePath = filePath;
 		this.originalFile = originalFile;
 		this.keynote = keynote;
 		this.tempo = tempo;
 		this.duration = duration;
+		this.name = name;
+		this.artist = artist;
+		this.key_right = key_right;
+		this.setCover(cover);
 	}
 
 	public String getFilePath() {
@@ -96,5 +105,37 @@ public class MusicPart {
 			throw new FileNotFoundException();
 		}
 		return file;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getArtist() {
+		return artist;
+	}
+
+	public void setArtist(String artist) {
+		this.artist = artist;
+	}
+
+	public String getKey_right() {
+		return key_right;
+	}
+
+	public void setKey_right(String key_right) {
+		this.key_right = key_right;
+	}
+
+	public String getCover() {
+		return cover;
+	}
+
+	public void setCover(String cover) {
+		this.cover = cover;
 	}
 }

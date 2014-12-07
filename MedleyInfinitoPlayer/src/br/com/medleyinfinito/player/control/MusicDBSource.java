@@ -7,6 +7,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import br.com.medleyinfinito.player.exception.MusicPartNotFound;
@@ -15,11 +17,13 @@ import br.com.medleyinfinito.player.model.MusicPart;
 public class MusicDBSource {
 
 	private static final Integer TEMPO_TOLERANCE = 15;
+	private List<MusicPart> alreadyPlayed;
 	private MusicPart currentMusicPart;
 	private MusicPart nextMusicPart;
 	private Connection conn;
 
 	public MusicDBSource() throws SQLException, MusicPartNotFound {
+		alreadyPlayed = new ArrayList<MusicPart>();
 		this.currentMusicPart = fetchRandomMusicPart();
 		this.nextMusicPart = null;
 		startNextMusicFetcher();
@@ -32,7 +36,7 @@ public class MusicDBSource {
 
 	private MusicPart fetchNextMusicPart() throws SQLException, MusicPartNotFound {
 		String restriction = // .
-				" filepath <> '" + this.currentMusicPart.getFilePath() + "'" + // .
+		" filepath <> '" + this.currentMusicPart.getFilePath() + "'" + // .
 				" AND keynote = " + this.currentMusicPart.getKeynote() + // .
 				" AND (tempo BETWEEN " + Integer.toString(this.currentMusicPart.getTempo() - TEMPO_TOLERANCE) + // .
 				" AND " + Integer.toString(this.currentMusicPart.getTempo() + TEMPO_TOLERANCE) + // .
@@ -69,33 +73,47 @@ public class MusicDBSource {
 		return this.conn;
 	}
 
-	private MusicPart fetchMusicPart() throws SQLException, MusicPartNotFound {
-		return this.fetchMusicPart(null);
-	}
-
 	private MusicPart fetchMusicPart(String restriction) throws SQLException, MusicPartNotFound {
 		System.out.println("Connecting to DB");
 		Connection connection = createDBConnection();
-		String sql = "SELECT filepath, keynote, tempo FROM parts";
+		String sql = "SELECT filepath, originalfile, keynote, tempo FROM parts";
 		if (restriction != null) {
 			sql += " WHERE " + restriction;
 		}
 		System.out.println("Executing " + sql);
 		PreparedStatement statement = connection.prepareStatement(sql);
-		statement.setFetchSize(1);
 		ResultSet results = statement.executeQuery();
-		if (results.next()) {
+		List<MusicPart> musicParts = new ArrayList<MusicPart>();
+		while (results.next()) {
 			String filePath = results.getString("filepath");
+			String originalFile = results.getString("originalfile");
 			int keynote = results.getInt("keynote");
 			int tempo = results.getInt("tempo");
-			results.close();
-			MusicPart musicPart = new MusicPart(filePath, keynote, tempo);
-			System.out.println("fecth " + musicPart.toString());
-			return musicPart;
-		} else {
-			results.close();
+			musicParts.add(new MusicPart(filePath, originalFile, keynote, tempo));
+		}
+		if (musicParts.size() == 0) {
 			return null;
 		}
+		results.close();
+		System.out.println("fetch " + musicParts.size() + " music parts");
+		List<MusicPart> musicPartsToIgnore = new ArrayList<MusicPart>();
+		for (MusicPart musicPart : musicParts) {
+			if (alreadyPlayed.contains(musicPart)) {
+				musicPartsToIgnore.add(musicPart);
+			}
+		}
+		for (MusicPart musicPart : musicPartsToIgnore) {
+			musicParts.remove(musicPart);
+		}
+		if (musicParts.size() == 0) {
+			return null;
+		}
+		int index = (new Random().nextInt() % musicParts.size()) - 1;
+		index = index < 0 ? 0 : index;
+		System.out.println("index = " + index);
+		MusicPart musicPart = musicParts.get(index);
+		System.out.println("choose " + musicPart.getFilePath());
+		return musicPart;
 
 	}
 
@@ -107,9 +125,11 @@ public class MusicDBSource {
 				while (true) {
 					if (MusicDBSource.this.nextMusicPart == null) {
 						try {
-							System.out.println("Fecthing next music");
+							System.out.println("Fetching next music");
 							MusicDBSource.this.nextMusicPart = fetchNextMusicPart();
-							System.out.println("next music fetch");
+							if (MusicDBSource.this.nextMusicPart == null) {
+								System.out.println("No match music part found!");
+							}
 						} catch (SQLException | MusicPartNotFound e) {
 							e.printStackTrace();
 						}
@@ -124,12 +144,17 @@ public class MusicDBSource {
 		}).start();
 	}
 
-	public File getNextMusicFile() {
+	public File getNextMusicFile() throws FileNotFoundException {
+		if (this.alreadyPlayed.size() == 0) {
+			this.alreadyPlayed.add(this.currentMusicPart);
+			return this.currentMusicPart.getFile();
+		}
 		if (this.nextMusicPart == null) {
 			return null;
 		}
 		try {
 			File file = this.nextMusicPart.getFile();
+			this.alreadyPlayed.add(this.currentMusicPart);
 			this.currentMusicPart = this.nextMusicPart;
 			this.nextMusicPart = null;
 			return file;

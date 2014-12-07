@@ -19,7 +19,7 @@ public class MusicDBSource {
 		public void musicChanged();
 	}
 
-	private static final Integer TEMPO_TOLERANCE = 5;
+	private static final Integer TEMPO_TOLERANCE = 15;
 	private List<MusicPart> alreadyPlayed;
 	private MusicPart currentMusicPart;
 	private MusicPart nextMusicPart;

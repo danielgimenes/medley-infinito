@@ -19,7 +19,7 @@ public class MusicDBSource {
 	private Connection conn;
 
 	public MusicDBSource() throws SQLException, MusicPartNotFound {
-		this.currentMusicPart = null;
+		this.currentMusicPart = fetchRandomMusicPart();
 		this.nextMusicPart = null;
 		startNextMusicFetcher();
 		try {

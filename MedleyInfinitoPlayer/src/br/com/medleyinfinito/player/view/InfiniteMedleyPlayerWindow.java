@@ -80,7 +80,7 @@ public class InfiniteMedleyPlayerWindow {
 		frame = new JFrame("Infinite Medley");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JFrame.setDefaultLookAndFeelDecorated(true);
-		frame.setIconImage(new ImageIcon("logo_infinite_medley.png").getImage());
+		frame.setIconImage(new ImageIcon("/mp3/logo_infinite_medley.png").getImage());
 		centerWindow();
 		mainPanel = new JPanel();
 		mainPanel.setLayout(null);
@@ -96,7 +96,7 @@ public class InfiniteMedleyPlayerWindow {
 
 		nextAlbumImage = new JLabel("");
 
-		BufferedImage logoPic = ImageIO.read(new File("logo_infinite_medley_transparent.png"));
+		BufferedImage logoPic = ImageIO.read(new File("/mp3/logo_infinite_medley_transparent.png"));
 		JLabel logo = new JLabel(new ImageIcon(getScaledImage(logoPic, 200, 130)));
 
 		titleLabel = new JLabel("<Título>");

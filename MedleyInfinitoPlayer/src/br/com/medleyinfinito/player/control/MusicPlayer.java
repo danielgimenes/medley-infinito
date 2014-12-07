@@ -8,7 +8,7 @@ import br.com.medleyinfinito.player.model.MusicPart;
 public abstract class MusicPlayer {
 
 	private static final Integer FADE_OUT_DURATION = 10;
-	private static final Integer DEFAULT_SLEEP_DURATION = 30;
+	private static final Integer DEFAULT_SLEEP_DURATION = 20;
 
 	public abstract void start() throws MalformedURLException, IOException;
 
@@ -30,6 +30,28 @@ public abstract class MusicPlayer {
 			e.printStackTrace();
 		}
 		System.out.println("fading out...");
+		new Thread(new ProcessCleaner(p)).start();
 	}
+	
+	class ProcessCleaner implements Runnable {
+		private Process p;
+
+		public ProcessCleaner(Process p) {
+			this.p = p;
+		}
+
+		@Override
+		public void run() {
+			while (p.isAlive()) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			p.destroy();
+		}
+		
+	};
 
 }

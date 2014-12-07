@@ -17,6 +17,9 @@ def process(input_dir, output_dir, parts, length):
         print "Analyzing {}".format(filepath)
         key, tempo, start, end  = analyze(filepath)
         insert_data_in_db.insert(filepath, key, tempo)
+        if key > 11:
+            key = ((key - 9) % 12)
+
         # crop the edges
         os.system(
             "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(

@@ -1,5 +1,6 @@
 import argparse
 import database
+import echo_functions
 import glob
 import os
 import pydub
@@ -26,7 +27,7 @@ def process(input_dir, output_dir, parts, length):
                     key, tempo, right_key  = sonic_functions.analyze(filepath)
                     if key > 11:
                         key = ((key - 9) % 12)
-                    name, cover, artist = METADATAAPIMODAFOCA(filepath)
+                    name, cover, artist = echo_functions.retrieve_inf(filepath)
                     # crop the edges
                     print "Fade the edges"
                     song = pydub.AudioSegment.from_mp3(filepath).fade_in(10000).fade_out(10000)

@@ -1,12 +1,13 @@
 import argparse
+import database
 import glob
 import os
-
-import database
-import split_mp3
-from replace_filename_spaces import replace_spaces
+import pydub
 import sonic_functions
+import split_mp3
 import xml
+
+from replace_filename_spaces import replace_spaces
 
 
 def process(input_dir, output_dir, parts, length):
@@ -27,16 +28,10 @@ def process(input_dir, output_dir, parts, length):
                         key = ((key - 9) % 12)
                     database.insert(filepath, key, tempo)
                     # crop the edges
-                    print "Crop the edges"
-                    os.system(
-                        "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(
-                            filepath,
-                            split_mp3.convert_time(start),
-                            split_mp3.convert_time(end-start),
-                            filepath
-                        )
-                    )
-                except KeyError, xml.etree.ElementTree.ParseError:
+                    print "Fade the edges"
+                    song = pydub.AudioSegment.from_mp3(filepath).fade_in(10000).fade_out(10000)
+                    song.export(filepath, format="mp3")
+                except (KeyError, xml.etree.ElementTree.ParseError, IndexError):
                     pass
             else:
                 print "Skipping... Already in database"

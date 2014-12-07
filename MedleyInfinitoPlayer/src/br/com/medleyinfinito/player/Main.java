@@ -15,14 +15,12 @@ public class Main {
 			musicFilesDirectory = DEFAULT_MUSIC_FILES_DIRECTORY;
 		}
 		try {
-			MusicFilesSource source = new MusicFilesSource(musicFilesDirectory);
-			MusicPlayer player = new MusicFilesSourcePlayer(source);
-			// MusicPlayer player = new
-			// MusicFilesPathPlayer(DEFAULT_MUSIC_FILES_DIRECTORY +
-			// "06_Unchain_Utopia.mp3",
-			// DEFAULT_MUSIC_FILES_DIRECTORY + "03_-_Nemesis.mp3",
-			// DEFAULT_MUSIC_FILES_DIRECTORY
-			// + "02_-_All_Love_Is_Gone.mp3");
+			// MusicFilesSource source = new
+			// MusicFilesSource(musicFilesDirectory);
+			// MusicPlayer player = new MusicFilesSourcePlayer(source);
+
+			MusicPlayer player = new MusicFilesPathPlayer(DEFAULT_MUSIC_FILES_DIRECTORY + "01._At_Tragic_Heights.mp3");
+
 			player.start();
 			System.exit(0);
 		} catch (Exception e) {

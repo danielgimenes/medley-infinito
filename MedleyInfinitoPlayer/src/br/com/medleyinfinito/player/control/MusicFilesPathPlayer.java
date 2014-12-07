@@ -33,7 +33,7 @@ public class MusicFilesPathPlayer extends MusicPlayer {
 			}
 			jmfPlayer.start();
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(20000);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

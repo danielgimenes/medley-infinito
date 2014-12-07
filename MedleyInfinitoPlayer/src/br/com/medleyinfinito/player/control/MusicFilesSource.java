@@ -22,11 +22,11 @@ public class MusicFilesSource {
 		this.musicFileIndex = 0;
 	}
 
-	public String getNextMusicFilePath() {
+	public File getNextMusicFile() {
 		if (this.musicFileIndex >= musicFiles.length) {
 			return null;
 		}
-		return this.musicFiles[this.musicFileIndex++].getAbsolutePath();
+		return this.musicFiles[this.musicFileIndex++];
 	}
 
 }

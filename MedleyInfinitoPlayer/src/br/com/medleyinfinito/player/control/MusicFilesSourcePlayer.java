@@ -1,5 +1,6 @@
 package br.com.medleyinfinito.player.control;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 
@@ -19,20 +20,21 @@ public class MusicFilesSourcePlayer extends MusicPlayer {
 
 	@Override
 	public void start() throws JMFPlayerNotInitializedException, NoPlayerException, MalformedURLException, IOException {
-		String musicFilePath = null;
-		while ((musicFilePath = source.getNextMusicFilePath()) != null) {
-			System.out.println("Playing file " + musicFilePath);
-			this.jmfPlayer = super.createJMFPlayer(musicFilePath);
+		File musicFile = null;
+		while ((musicFile = source.getNextMusicFile()) != null) {
+			System.out.println("Playing file " + musicFile.getAbsolutePath());
+			this.jmfPlayer = super.createJMFPlayer(musicFile.getAbsolutePath());
 			this.jmfPlayer.start();
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			while (this.jmfPlayer.getState() != Player.Realized) {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			this.jmfPlayer.stop();
 			this.jmfPlayer.close();
 			this.jmfPlayer.deallocate();
 		}
 	}
-
 }

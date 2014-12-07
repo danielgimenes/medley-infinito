@@ -31,13 +31,7 @@ public class MusicFilesPathPlayer extends MusicPlayer {
 			if (jmfPlayer == null) {
 				throw new JMFPlayerNotInitializedException();
 			}
-			jmfPlayer.start();
-			try {
-				Thread.sleep(20000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			jmfPlayer.stop();
+			super.playUntilEnd(jmfPlayer);
 		}
 	}
 

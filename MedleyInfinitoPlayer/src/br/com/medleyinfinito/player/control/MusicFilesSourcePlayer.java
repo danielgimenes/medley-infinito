@@ -22,19 +22,9 @@ public class MusicFilesSourcePlayer extends MusicPlayer {
 	public void start() throws JMFPlayerNotInitializedException, NoPlayerException, MalformedURLException, IOException {
 		File musicFile = null;
 		while ((musicFile = source.getNextMusicFile()) != null) {
-			System.out.println("Playing file " + musicFile.getAbsolutePath());
+			System.out.println("Playing file " + musicFile.getPath());
 			this.jmfPlayer = super.createJMFPlayer(musicFile.getAbsolutePath());
-			this.jmfPlayer.start();
-			while (this.jmfPlayer.getState() != Player.Realized) {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-			this.jmfPlayer.stop();
-			this.jmfPlayer.close();
-			this.jmfPlayer.deallocate();
+			super.playUntilEnd(this.jmfPlayer);
 		}
 	}
 }

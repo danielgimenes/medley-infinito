@@ -6,7 +6,7 @@ def retrieve_inf(file_path):
   config.ECHO_NEST_API_KEY = "WUODI5WC8Y1QIHJTJ"
 
   filename = file_path
-  _ = os.popen("avconv -i " + filename + " -f ffmetadata metadata.txt").read()
+  _ = os.popen("avconv -y -i " + filename + " -f ffmetadata metadata.txt").read()
 
   with open("metadata.txt", 'r') as outfile:
       line=outfile.read().split('\n')

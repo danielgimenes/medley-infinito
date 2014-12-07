@@ -29,6 +29,9 @@ def process(input_dir, output_dir, parts, length):
                         key = ((key - 9) % 12)
                     right_key = right_key.replace(" ", "").title()
                     name, cover, artist = echo_functions.retrieve_inf(filepath)
+                    for sc in "!@#$%^&*()[]{}';:,<>?|`~-=+":
+                        name = name.replace(sc, "")
+                        artist = artist.replace(sc, "")
                     # crop the edges
                     print "Fade the edges"
                     song = pydub.AudioSegment.from_mp3(filepath).fade_in(10000).fade_out(10000)
@@ -38,8 +41,9 @@ def process(input_dir, output_dir, parts, length):
                 except (KeyError, xml.etree.ElementTree.ParseError, IndexError):
                     pass
             else:
-                print "Updating metadata..."
-                database.update(filepath, name, cover, artist, right_key, duration)
+                print "Skipping..."
+                #print "Updating metadata..."
+                #database.update(filepath, name, cover, artist, right_key, duration)
 
 
 if __name__ == "__main__":

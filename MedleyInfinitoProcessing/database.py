@@ -9,7 +9,7 @@ def insert(filepath, key_id, tempo, name, cover, artist, right_key, duration):
     )
     cur = conn.cursor()
     cur.execute(
-        "INSERT INTO parts (filepath, keynote, tempo, originalfile, name, cover, artist, right_key, duration) VALUES ('{}', {}, {}, '{}', '{}', '{}', '{}', '{}', '{}', {});".format(
+        "INSERT INTO parts (filepath, keynote, tempo, originalfile, name, cover, artist, right_key, duration) VALUES ('{}', {}, {}, '{}', '{}', '{}', '{}', '{}', {});".format(
             filepath, key_id, tempo, filename, name, cover, artist, right_key, duration
         )
     )

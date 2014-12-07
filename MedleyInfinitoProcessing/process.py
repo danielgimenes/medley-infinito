@@ -2,10 +2,10 @@ import argparse
 import glob
 import os
 
-import insert_data_in_db
+import database
 import split_mp3
 from replace_filename_spaces import replace_spaces
-from sonic_functions import analyze
+import sonic_functions
 
 
 def process(input_dir, output_dir, parts, length):
@@ -14,21 +14,27 @@ def process(input_dir, output_dir, parts, length):
     mp3files = glob.glob(output_dir + "/*.mp3")
 
     for filepath in mp3files:
-        print "Analyzing {}".format(filepath)
-        key, tempo, start, end  = analyze(filepath)
-        insert_data_in_db.insert(filepath, key, tempo)
-        if key > 11:
-            key = ((key - 9) % 12)
-
-        # crop the edges
-        os.system(
-            "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(
-                filepath,
-                split_mp3.convert_time(start),
-                split_mp3.convert_time(start-end),
-                filepath
+        print "Processing {}".format(filepath)
+        print "Check if already in database"
+        analyze = database.doesnt_exist(filepath)
+        if analyze:
+            print "Analyze"
+            key, tempo, start, end  = sonic_functions.analyze(filepath)
+            if key > 11:
+                key = ((key - 9) % 12)
+            database.insert(filepath, key, tempo)
+            # crop the edges
+            print "Crop the edges"
+            os.system(
+                "avconv -y -i {} -acodec copy -ss {} -t {} {}".format(
+                    filepath,
+                    split_mp3.convert_time(start),
+                    split_mp3.convert_time(start-end),
+                    filepath
+                )
             )
-        )
+        else:
+            print "Skipping... Already in database"
 
 
 if __name__ == "__main__":

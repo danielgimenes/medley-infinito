@@ -29,14 +29,20 @@ def analyze(file_path):
 
   json_dict = json.loads(response)
 
-  overall_tempo = json_dict.get('auftakt_result').get('overall_tempo')
+  try:
+    overall_tempo = json_dict.get('auftakt_result').get('overall_tempo')
+  except AttributeError:
+    overall_tempo = None
 
   response = commands.getoutput("php -f MedleyInfinitoProcessing/analyzeKey.php " + file_id)
 
   json_dict = json.loads(response)
 
-  key_index = json_dict.get('tonart_result').get('key_index')
-
-  key = json_dict.get('tonart_result').get('key')
+  try:
+    key_index = json_dict.get('tonart_result').get('key_index')
+    key = json_dict.get('tonart_result').get('key')
+  except AttributeError:
+    key_index = None
+    key = None
 
   return key_index, overall_tempo, key

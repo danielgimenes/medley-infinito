@@ -8,7 +8,7 @@ def insert(filepath, key_id, tempo, name, cover, artist, right_key, duration):
         "host=localhost dbname=medleyinfinito_db user=postgres password=cogitoR341"
     )
     cur = conn.cursor()
-    cur.execute(
+    cur.executemany(
         "INSERT INTO parts (filepath, keynote, tempo, originalfile, name, cover, artist, right_key, duration) VALUES ('{}', {}, {}, '{}', '{}', '{}', '{}', '{}', {});".format(
             filepath, key_id, tempo, filename, name, cover, artist, right_key, duration
         )

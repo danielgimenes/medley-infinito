@@ -17,7 +17,6 @@ public class MusicSourcePlayer extends MusicPlayer {
 	public void start() throws MalformedURLException, IOException {
 		MusicPart musicFile = null;
 		while ((musicFile = source.getNextMusic()) != null) {
-			System.out.println("Playing file " + musicFile.getFilePath());
 			super.playUntilEnd(musicFile);
 		}
 	}

@@ -14,7 +14,7 @@ public abstract class MusicPlayer {
 
 	protected void playUntilEnd(MusicPart musicPart) throws IOException {
 		ProcessBuilder pb = new ProcessBuilder("cvlc", "--no-loop", musicPart.getFilePath());
-		System.out.println("starting...");
+		System.out.println("Playing '" + musicPart.getName() + "' by '" + musicPart.getArtist() + "...");
 		Process p = pb.start();
 		int sleepDurationInSeconds;
 		if (musicPart.getDuration() > 0) {
@@ -24,15 +24,15 @@ public abstract class MusicPlayer {
 			sleepDurationInSeconds = DEFAULT_SLEEP_DURATION;
 		}
 		try {
-			System.out.println("Waiting for " + sleepDurationInSeconds + " seconds");
+			System.out.println(sleepDurationInSeconds + " seconds to start fade out");
 			Thread.sleep(sleepDurationInSeconds * 1000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		System.out.println("fading out...");
+		System.out.println("Fading out...");
 		new Thread(new ProcessCleaner(p)).start();
 	}
-	
+
 	class ProcessCleaner implements Runnable {
 		private Process p;
 
@@ -51,7 +51,7 @@ public abstract class MusicPlayer {
 			}
 			p.destroy();
 		}
-		
+
 	};
 
 }

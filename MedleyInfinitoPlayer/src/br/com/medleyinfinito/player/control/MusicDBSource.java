@@ -15,8 +15,10 @@ import br.com.medleyinfinito.player.model.MusicPart;
 
 public class MusicDBSource {
 
-	public interface NextMusicListener {
-		public void musicChanged();
+	public interface MusicPlayerEventListener {
+		public void currentMusicChanged(MusicPart currentMusic);
+
+		public void nextMusicDefined(MusicPart nextMusic);
 	}
 
 	private static final Integer TEMPO_TOLERANCE = 15;
@@ -24,13 +26,15 @@ public class MusicDBSource {
 	private MusicPart currentMusicPart;
 	private MusicPart nextMusicPart;
 	private Connection conn;
-	private List<NextMusicListener> listeners;
+	private List<MusicPlayerEventListener> listeners;
+	private boolean fetchNextMusic = false;
 
 	public MusicDBSource() throws SQLException, MusicPartNotFound {
-		listeners = new ArrayList<NextMusicListener>();
+		System.out.println("Starting player...");
+		listeners = new ArrayList<MusicPlayerEventListener>();
 		alreadyPlayed = new ArrayList<MusicPart>();
+		System.out.println("Fetching first music");
 		this.currentMusicPart = fetchRandomMusicPart();
-		this.nextMusicPart = null;
 		startNextMusicFetcher();
 		try {
 			Thread.sleep(300);
@@ -50,8 +54,10 @@ public class MusicDBSource {
 				" AND " + Integer.toString((this.currentMusicPart.getTempo() / 2) + TEMPO_TOLERANCE) + // .
 				") OR (tempo BETWEEN " + Integer.toString((this.currentMusicPart.getTempo() * 2) - TEMPO_TOLERANCE) + // .
 				" AND " + Integer.toString((this.currentMusicPart.getTempo() * 2) + TEMPO_TOLERANCE) + ")"; // .
-		System.out.println("fetchNextMusicPart() restriction = " + restriction);
-		return this.fetchMusicPart(restriction);
+		MusicPart next = this.fetchMusicPart(restriction);
+		System.out.println("Next Music = '" + next.getName() + "' by '" + next.getArtist() + "'");
+		emitNextMusicDefinedEvent(next);
+		return next;
 	}
 
 	private MusicPart fetchRandomMusicPart() throws SQLException, MusicPartNotFound {
@@ -61,32 +67,28 @@ public class MusicDBSource {
 			if (keynote < 0) {
 				keynote *= -1;
 			}
-			System.out.println("fetchRandomMusicPart() keynote = " + keynote);
 			musicPart = this.fetchMusicPart(" keynote = " + keynote);
 		}
+		System.out.println("First Music = '" + musicPart.getName() + "' by '" + musicPart.getArtist() + "'");
 		return musicPart;
 	}
 
 	private Connection createDBConnection() throws SQLException {
 		if (this.conn == null || this.conn.isClosed()) {
-			System.out.println("createDBConnection()");
 			String url = "jdbc:postgresql://localhost:5432/medleyinfinito_db";
 			String user = "postgres";
 			String password = "cogitoR341";
 			this.conn = DriverManager.getConnection(url, user, password);
-			System.out.println("createDBConnection() ok");
 		}
 		return this.conn;
 	}
 
 	private MusicPart fetchMusicPart(String restriction) throws SQLException, MusicPartNotFound {
-		System.out.println("Connecting to DB");
 		Connection connection = createDBConnection();
 		String sql = "SELECT filepath, originalfile, keynote, tempo, duration, artist, cover, name, right_key FROM parts";
 		if (restriction != null) {
 			sql += " WHERE " + restriction;
 		}
-		System.out.println("fetchMusicPart(String restriction) sql = " + sql);
 		PreparedStatement statement = connection.prepareStatement(sql);
 		ResultSet results = statement.executeQuery();
 		List<MusicPart> musicParts = new ArrayList<MusicPart>();
@@ -100,14 +102,10 @@ public class MusicDBSource {
 			String artist = results.getString("artist");
 			String cover = results.getString("cover");
 			String right_key = results.getString("right_key");
-			musicParts.add(new MusicPart(filePath, originalFile,
- keynote, tempo, duration, name, artist, right_key, cover));
-		}
-		if (musicParts.size() == 0) {
-			return null;
+			musicParts.add(new MusicPart(filePath, originalFile, keynote, tempo, duration, name, artist, right_key,
+					cover));
 		}
 		results.close();
-		System.out.println("fetchMusicPart(String restriction) fetch " + musicParts.size() + " music parts");
 		List<MusicPart> musicPartsToIgnore = new ArrayList<MusicPart>();
 		for (MusicPart musicPart : musicParts) {
 			if (alreadyPlayed.contains(musicPart)) {
@@ -117,14 +115,13 @@ public class MusicDBSource {
 		for (MusicPart musicPart : musicPartsToIgnore) {
 			musicParts.remove(musicPart);
 		}
+		System.out.println("Possible continuations: " + musicParts.size());
 		if (musicParts.size() == 0) {
 			return null;
 		}
 		int index = new Random().nextInt(musicParts.size());
 		index = index < 0 ? 0 : index;
-		System.out.println("fetchMusicPart(String restriction) index = " + index);
 		MusicPart musicPart = musicParts.get(index);
-		System.out.println("fetchMusicPart(String restriction) choose " + musicPart.getFilePath());
 		return musicPart;
 
 	}
@@ -133,14 +130,16 @@ public class MusicDBSource {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("NextMusicFetcher started");
 				while (true) {
-					if (MusicDBSource.this.nextMusicPart == null) {
+					if (MusicDBSource.this.fetchNextMusic == true) {
 						try {
 							System.out.println("Fetching next music");
+							MusicDBSource.this.fetchNextMusic = false;
 							MusicDBSource.this.nextMusicPart = fetchNextMusicPart();
 							if (MusicDBSource.this.nextMusicPart == null) {
-								System.out.println("No match music part found!");
+								System.out.println("No matching music part found!");
+								System.out.println("Stopping player...");
+								return;
 							}
 						} catch (SQLException | MusicPartNotFound e) {
 							e.printStackTrace();
@@ -159,7 +158,8 @@ public class MusicDBSource {
 	public MusicPart getNextMusic() throws FileNotFoundException {
 		if (this.alreadyPlayed.size() == 0) {
 			this.alreadyPlayed.add(this.currentMusicPart);
-			callListeners();
+			emitCurrentMusicChangedEvent(this.currentMusicPart);
+			this.fetchNextMusic = true;
 			return this.currentMusicPart;
 		}
 		if (this.nextMusicPart == null) {
@@ -169,17 +169,24 @@ public class MusicDBSource {
 		this.alreadyPlayed.add(this.currentMusicPart);
 		this.currentMusicPart = this.nextMusicPart;
 		this.nextMusicPart = null;
-		callListeners();
+		emitCurrentMusicChangedEvent(this.currentMusicPart);
+		this.fetchNextMusic = true;
 		return musicPart;
 	}
 
-	private void callListeners() {
-		for (NextMusicListener listener : this.listeners) {
-			listener.musicChanged();
+	private void emitCurrentMusicChangedEvent(MusicPart currentMusic) {
+		for (MusicPlayerEventListener listener : this.listeners) {
+			listener.currentMusicChanged(currentMusic);
 		}
 	}
 
-	public void addNextMusicListener(NextMusicListener nextMusicListener) {
+	private void emitNextMusicDefinedEvent(MusicPart nextMusic) {
+		for (MusicPlayerEventListener listener : this.listeners) {
+			listener.nextMusicDefined(nextMusic);
+		}
+	}
+
+	public void addMusicPlayerEventListener(MusicPlayerEventListener nextMusicListener) {
 		listeners.add(nextMusicListener);
 
 	}

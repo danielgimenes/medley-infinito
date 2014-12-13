@@ -56,11 +56,20 @@ public class InfiniteMedleyPlayerWindow {
 
 	private void startMusicPlayer() throws SQLException, MusicPartNotFound, MalformedURLException, IOException {
 		source = new MusicDBSource();
-		source.addNextMusicListener(new MusicDBSource.NextMusicListener() {
+		source.addMusicPlayerEventListener(new MusicDBSource.MusicPlayerEventListener() {
 			@Override
-			public void musicChanged() {
+			public void currentMusicChanged(MusicPart currentMusic) {
 				try {
-					InfiniteMedleyPlayerWindow.this.updateGUI();
+					InfiniteMedleyPlayerWindow.this.updateGUICurrentMusic(currentMusic);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			@Override
+			public void nextMusicDefined(MusicPart nextMusic) {
+				try {
+					InfiniteMedleyPlayerWindow.this.updateGUINextMusic(nextMusic);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -188,9 +197,7 @@ public class InfiniteMedleyPlayerWindow {
 		frame.setVisible(true);
 	}
 
-	protected void updateGUI() throws IOException {
-		MusicPart currentMusic = source.getDefinedCurrentMusic();
-		MusicPart nextMusic = source.getDefinedNextMusic();
+	protected void updateGUICurrentMusic(MusicPart currentMusic) throws IOException {
 		titleLabel.setText(currentMusic.getName());
 		artistLabel.setText(currentMusic.getArtist());
 		keyLabel.setText(currentMusic.getKey_right());
@@ -203,14 +210,13 @@ public class InfiniteMedleyPlayerWindow {
 			albumImage.setForeground(BACKGROUND_COLOR);
 			albumImage.setBackground(BACKGROUND_COLOR);
 		}
+		nextTitleLabel.setText("Buscando...");
+		nextArtistLabel.setText("");
+		nextAlbumImage.setIcon(null);
+		nextAlbumImage.setForeground(BACKGROUND_COLOR);
+	}
 
-		if (nextMusic == null) {
-			nextTitleLabel.setText("");
-			nextArtistLabel.setText("");
-			nextAlbumImage.setIcon(null);
-			nextAlbumImage.setForeground(BACKGROUND_COLOR);
-			return;
-		}
+	private void updateGUINextMusic(MusicPart nextMusic) throws MalformedURLException, IOException {
 		nextTitleLabel.setText(nextMusic.getName());
 		nextArtistLabel.setText(nextMusic.getArtist());
 		if (nextMusic.getCover() != null && nextMusic.getCover().trim().length() > 0) {
@@ -221,7 +227,6 @@ public class InfiniteMedleyPlayerWindow {
 			nextAlbumImage.setForeground(BACKGROUND_COLOR);
 			nextAlbumImage.setBackground(BACKGROUND_COLOR);
 		}
-
 	}
 
 	private void centerWindow() {

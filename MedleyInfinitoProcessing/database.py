@@ -8,11 +8,19 @@ def insert(filepath, key_id, tempo, name, cover, artist, right_key, duration):
         "host=localhost dbname=medleyinfinito_db user=postgres password=cogitoR341"
     )
     cur = conn.cursor()
-    cur.execute(
-        "INSERT INTO parts (filepath, keynote, tempo, originalfile, name, cover, artist, right_key, duration) VALUES ('{}', {}, {}, '{}', '{}', '{}', '{}', '{}', {});".format(
-            filepath, key_id, tempo, filename, name, cover, artist, right_key, duration
-        )
-    )
+    args_list = [
+        (filepath,),
+        (key_id,),
+        (tempo,),
+        (filename,),
+        (name,),
+        (cover,),
+        (artist,),
+        (right_key,),
+        (duration,)
+    ]
+
+    cur.executemany("""INSERT INTO parts VALUES %s""", args_list)
     conn.commit()
     cur.close()
     conn.close()
